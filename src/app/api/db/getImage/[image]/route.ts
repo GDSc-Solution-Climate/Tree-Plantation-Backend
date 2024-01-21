@@ -13,7 +13,7 @@ async function handler(req:Request,{ params }:{ params : { image: string }}) {
 
    
     const u = await ImageModel.findOne({
-      imageId : image
+      _id : image
     });
       
      
