@@ -7,7 +7,7 @@ mongoose.Promise = global.Promise;
 const likeSchema = new Schema(
   {
     user: { type: mongoose.Types.ObjectId, ref: "User", required: true },
-    project: { type: mongoose.Types.ObjectId, ref: "Project", required: true },
+    image: { type: mongoose.Types.ObjectId, ref: "Image", required: true },
     // timestamp: { type: Date, default: Date.now },
   },
   { timestamps: true }
@@ -22,7 +22,7 @@ const imageSchema = new Schema({
     desc: { type: String, required: true },
     owner: { type: mongoose.Types.ObjectId, ref: "User", required: true },
     image:{ type: String, required: true, default:""},
-    reply: { type: mongoose.Types.ObjectId, ref: "Comment", required: true },
+    reply:[ { type: mongoose.Types.ObjectId, ref: "Comment", requires:false, default:[]}],
     likeCount:{ type:Number,default:0}
 },
 { timestamps: true })

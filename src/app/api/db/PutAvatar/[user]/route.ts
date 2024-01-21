@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import { UserModel } from "@/model/schema";
-import formidable from 'formidable';
 import { v2 as cloudinary } from 'cloudinary';
-import { NextApiRequest } from 'next';
+
 
 cloudinary.config({ 
   cloud_name: process.env.CLOUD_NAME, 
@@ -17,7 +16,7 @@ export const config = {
   },
 };
 
-async function handler(req: NextApiRequest, { params }: { params: { user: string } }) {
+async function handler(req: Request,{ params }: { params: { user: string } }) {
   try {
     await dbConnect();
     const user = params.user;
@@ -26,30 +25,48 @@ async function handler(req: NextApiRequest, { params }: { params: { user: string
       return NextResponse.json({ message: 'Invalid user parameter' });
     }
 
-    const form = new formidable.IncomingForm();
+    let formData = await req.formData();
+    let body = Object.fromEntries(formData);
 
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        return NextResponse.json({ error: 'Internal Server Error' });
-      }
-      console.log(err, fields, files);
 
-      // const filePath = files.file.path;
+    const imageFile = body.filePath as File;
 
-      // cloudinary.uploader.upload(filePath, { public_id: "olympic_flag" }, function(error, result) {
-      //   if (error) {
-      //     console.error(error);
-      //     return NextResponse.json({ error: 'Cloudinary Upload Error' });
-      //   }
+    // Validate file existence
+    if (!imageFile) {
+      return NextResponse.json({ error: 'Image file not found.' });
+    }
 
-      //   console.log(result);
-      //   // Handle the Cloudinary upload result here
-      //   return NextResponse.json({ success: true, result });
-      // });
+   
+    const arrayBuffer = await imageFile.arrayBuffer();
+    const buffer = new Uint8Array(arrayBuffer);
+
+    
+   
+    const cloudinaryResponse: Record<string, any> = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream({}, function (error, result) {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result!);
+        }
+      }).end(buffer);
     });
+    
+
+
+    if (typeof cloudinaryResponse === 'object' && cloudinaryResponse !== null) {
+      console.log('cloudinaryResponse is an object:', cloudinaryResponse);
+      const u = await UserModel.findOneAndUpdate({ username: user }, { $set: { avatar: cloudinaryResponse.secure_url } },  { new: true } );
+      return NextResponse.json(u);
+ 
+    } else {
+      console.log('cloudinaryResponse is not an object or is null/undefined:', cloudinaryResponse);
+    }
+  
+
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: 'Internal Server Error' });
+    return  NextResponse.json({ error: 'Internal Server Error' });
   }
 }
 
