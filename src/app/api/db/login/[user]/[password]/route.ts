@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import { UserModel } from "@/model/schema";
-import { createHash } from 'crypto';
+import jwt from 'jsonwebtoken';
 
-const generateToken = () => {
-    // Use a more secure method for generating tokens, for example, crypto.randomBytes
-    return createHash('sha256').update(Math.random().toString(36).substr(2)).digest('hex');
-  };
+
   
 
 async function handler(req:Request,{ params }:{ params : { user: string, password: string }}) {
@@ -24,13 +21,16 @@ async function handler(req:Request,{ params }:{ params : { user: string, passwor
       password:password
     });
     console.log(u)
-      if(u){
-       let token = generateToken();
-       return  NextResponse.json({token: token});
-      }
-      else{
-        return NextResponse.json({message:"Wrong username or password"})
-      }
+    if (u) {
+      // Create a JWT token
+      const token = jwt.sign({ userId: u._id, username: u.username }, process.env.JWT_SECRET!, {
+        expiresIn: '1h', // Token expiration time
+      });
+
+      return NextResponse.json({ token: token });
+    } else {
+      return NextResponse.json({ message: 'Wrong username or password' });
+    }
      
   
 }
