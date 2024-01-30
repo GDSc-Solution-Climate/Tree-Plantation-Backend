@@ -57,7 +57,13 @@ async function handler(req: Request,{ params }: { params: { user: string } }) {
     if (typeof cloudinaryResponse === 'object' && cloudinaryResponse !== null) {
       console.log('cloudinaryResponse is an object:', cloudinaryResponse);
       const u = await UserModel.findOneAndUpdate({ username: user }, { $set: { avatar: cloudinaryResponse.secure_url } },  { new: true } );
-      return NextResponse.json(u);
+      return NextResponse.json(u, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+          'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+        },
+    });
  
     } else {
       console.log('cloudinaryResponse is not an object or is null/undefined:', cloudinaryResponse);

@@ -11,7 +11,13 @@ async function handler(req: Request) {
     email ,username, password
     });
     await user.save();
-    return NextResponse.json(user)
+    return NextResponse.json(user, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+      },
+      })
   } catch (error) {
     console.error('Error creating user:', error);
    return NextResponse.json({message: error})

@@ -2,9 +2,6 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import { UserModel,ImageModel,LikeModel } from "@/model/schema";
 
-
-
-
 async function handler(req: Request) {
   await dbConnect();
 
@@ -41,7 +38,13 @@ console.log("done");
     return NextResponse.json({
       message: 'Project Liked successfully',
        user: updatedProject,
-    });
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+      },
+  });
   
 
   } catch (error) {

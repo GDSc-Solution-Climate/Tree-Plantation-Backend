@@ -39,7 +39,13 @@ async function handler(req: Request) {
       return NextResponse.json({
         message: 'Like removed successfully',
         project: updatedProject,
-      });
+      }, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+          'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+        },
+    });
     } else if ( !existingLike) {
       // If remove is false and the like doesn't exist, add the like
     

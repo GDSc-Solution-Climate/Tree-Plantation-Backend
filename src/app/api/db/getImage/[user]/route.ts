@@ -19,7 +19,13 @@ async function handler(req:Request,{ params }:{ params : { user: string }}) {
     const images = u;
       
      
-      return  NextResponse.json(images);
+      return  NextResponse.json(images, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+          'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+        },
+    });
 }
 catch(err){
     return NextResponse.json(err);

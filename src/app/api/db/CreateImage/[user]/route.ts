@@ -70,7 +70,13 @@ async function handler(req: Request,{ params }: { params: { user: string } }) {
         })
         await image.save();
         const u = await UserModel.findOneAndUpdate({ username: user }, { $push: { images: image._id }, $set:{ points:point/10} },{ new: true } );
-        return NextResponse.json(u);
+        return NextResponse.json(u, {
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+          },
+      });
    
       } else {
         console.log('cloudinaryResponse is not an object or is null/undefined:', cloudinaryResponse);

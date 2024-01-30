@@ -15,7 +15,13 @@ async function handler(req:Request,{ params }:{ params : { user: string }}) {
       const u = await UserModel.findOneAndUpdate({ username: user }, { $set: { bio: bio } },  { new: true } );
 
      
-      return  NextResponse.json(u);
+      return  NextResponse.json(u, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+          'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+        },
+    });
 }
 catch(err){
     return NextResponse.json(err);

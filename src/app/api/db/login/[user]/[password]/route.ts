@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken';
 
 async function handler(req:Request,{ params }:{ params : { user: string, password: string }}) {
     try{
+      
     await dbConnect();
     
     const { user, password }  = params;
@@ -26,8 +27,16 @@ async function handler(req:Request,{ params }:{ params : { user: string, passwor
       const token = jwt.sign({ userId: u._id, username: u.username }, process.env.JWT_SECRET!, {
         expiresIn: '1h', // Token expiration time
       });
-
-      return NextResponse.json({ token: token });
+    
+      const response = NextResponse.json({ token: token }, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+          'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+        },
+      });
+      
+      return response;
     } else {
       return NextResponse.json({ message: 'Wrong username or password' });
     }

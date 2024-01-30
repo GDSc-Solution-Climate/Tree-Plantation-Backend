@@ -27,7 +27,13 @@ async function handler(req: Request) {
 
    
         const update = await ImageModel.findOneAndUpdate({_id: imageId}, { $push:{reply:comment._id }},{ new: true })
-        return NextResponse.json(update);
+        return NextResponse.json(update, {
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+          },
+  });
 
     
    
