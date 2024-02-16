@@ -22,8 +22,11 @@ const imageSchema = new Schema({
     desc: { type: String, required: true },
     owner: { type: mongoose.Types.ObjectId, ref: "User", required: true },
     image:{ type: String, required: true, default:""},
-    reply:[ { type: mongoose.Types.ObjectId, ref: "Comment", requires:false, default:[]}],
-    likeCount:{ type:Number,default:0}
+    reply:[ { type: mongoose.Types.ObjectId, ref: "Comment", required:false, default:[]}],
+    likeCount:{ type:Number,default:0},
+    parentImage: { type: mongoose.Types.ObjectId, ref: "Image", default: null }, // Reference to parent image
+    childImages: [{ type: mongoose.Types.ObjectId, ref: "Image", default: [] }] // References to child images forming a thread
+
 },
 { timestamps: true })
 

@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import { ImageModel , UserModel } from "@/model/schema";
 
-async function handler(req:Request,{ params }:{ params : { user: string }}) {
+async function handler(req:Request,{ params }:{ params : { user: string, image: string }}) {
     try{
     await dbConnect();
     
     const user  = params.user;
+    const image = params.image;
     if (!user || typeof user !== 'string') {
         return NextResponse.json({ message: 'Invalid user parameter' });
       }
@@ -14,7 +15,7 @@ async function handler(req:Request,{ params }:{ params : { user: string }}) {
    
     const u = await ImageModel.find({
       owner: user,
-      parentImage:null
+      parentImage:image
     });
 
     const images = u;

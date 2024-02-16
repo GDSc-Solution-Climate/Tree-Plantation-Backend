@@ -17,15 +17,21 @@ export const config = {
 };
 
 
-async function handler(req: Request,{ params }: { params: { user: string } }) {
+async function handler(req: Request,{ params }: { params: { user: string, image: string } }) {
   
       try {
         await dbConnect();
         const user = params.user;
+        const image = params.image;
     
         if (!user || typeof user !== 'string') {
-          return NextResponse.json({ message: 'Invalid user parameter' });
-        }
+            return NextResponse.json({ message: 'Invalid user parameter' });
+          }
+
+          if (!image || typeof image !== 'string') {
+            return NextResponse.json({ message: 'Invalid image parameter' });
+          }
+
         const userDetail = await UserModel.findOne({username:user});
         const userId = userDetail._id;
         console.log(userId);
@@ -46,7 +52,7 @@ async function handler(req: Request,{ params }: { params: { user: string } }) {
        
         const arrayBuffer = await imageFile.arrayBuffer();
         const buffer = new Uint8Array(arrayBuffer);
-     console.log(buffer);
+     
 
          
     const cloudinaryResponse: Record<string, any> = await new Promise((resolve, reject) => {
@@ -59,17 +65,19 @@ async function handler(req: Request,{ params }: { params: { user: string } }) {
         }).end(buffer);
       });
       
-  console.log(cloudinaryResponse);
+  
   
       if (typeof cloudinaryResponse === 'object' && cloudinaryResponse !== null) {
         console.log('cloudinaryResponse is an object:', cloudinaryResponse);
-        const image = new ImageModel({
+        const images = new ImageModel({
             desc:body.desc,
             image:cloudinaryResponse.secure_url,
-            owner:userId
+            owner:userId,
+            parentImage:image
         })
-        await image.save();
-        const u = await UserModel.findOneAndUpdate({ username: user }, { $push: { images: image._id }, $set:{ points:point/10} },{ new: true } );
+        await images.save();
+        
+        const u = await ImageModel.findOneAndUpdate({ _id: image }, { $push: { childImages: images._id }},{ new: true } );
         return NextResponse.json(u, {
           headers: {
             'Access-Control-Allow-Origin': '*',
@@ -84,7 +92,7 @@ async function handler(req: Request,{ params }: { params: { user: string } }) {
     
    
   } catch (error) {
-    console.error('Error creating image:', error);
+    console.error('Error creating user:', error);
    return NextResponse.json({message: error})
   } 
 }
