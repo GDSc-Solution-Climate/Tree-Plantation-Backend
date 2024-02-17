@@ -1,14 +1,25 @@
-import { readFileSync } from "fs";
 import { NextResponse } from "next/server";
-
+import dbConnect from "@/lib/dbConnect";
+import { ImageModel } from "@/model/schema";
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const modelName = "gemini-pro-vision";
 // Converts local file information to a GoogleGenerativeAI.Part object.
-function fileToGenerativePart(path: string, mimeType: string) {
+
+
+async function imageToGenerativePath(url: string, mimeType: string) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch image from ${url}: ${response.statusText}`);
+  }
+  
+  const imageData = await response.arrayBuffer(); 
+  const buffer = Buffer.from(imageData); 
+  const base64ImageData = buffer.toString('base64'); 
+
   return {
     inlineData: {
-      data: Buffer.from(readFileSync(path)).toString("base64"),
+      data: base64ImageData,
       mimeType,
     },
   };
@@ -28,7 +39,7 @@ const convertStringToJSON = (str: string) => {
     throw error;
   }
 };
-async function generateContent(filePath: string) {
+async function generateContent(url: string) {
   // For text-and-image input (multimodal), use the gemini-pro-vision model
   const model = genAI.getGenerativeModel({ model: modelName });
 
@@ -38,7 +49,8 @@ async function generateContent(filePath: string) {
     growing_season,
     time_to_become_a_tree of the plant in this image in json format`;
 
-  const imageParts = [fileToGenerativePart(filePath, "image/png")];
+  const imageParts = [await imageToGenerativePath(url, "image/jpeg")];
+  console.log(imageParts);
 
   const result = await model.generateContent([prompt, ...imageParts]);
   const response = await result.response;
@@ -47,12 +59,23 @@ async function generateContent(filePath: string) {
   return text;
 }
 
-const handler = async (req: Request, res: Response) => {
+const handler = async (req: Request, { params }:{ params: { image: string }}) => {
+  const image = params.image;
+  if (!image || typeof image !== 'string') {
+    return NextResponse.json({ message: 'Invalid image parameter' });
+  }
+
+
   try {
     // get file from request
     // store file in public folder
     // get file path
-    const data = await generateContent("./public/plant.jpg");
+
+    await dbConnect();
+    const images = await ImageModel.findById(image);
+    const cloudinaryUrl = images.image;
+    const data = await generateContent(cloudinaryUrl);
+    console.log(data)
     // delete file after processing
     let output = data;
     try {

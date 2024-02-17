@@ -17,7 +17,7 @@ async function handler(req:Request,{ params }:{ params : { user: string }}) {
       parentImage:null
     });
 
-    const images = u;
+  
       
      
       return  NextResponse.json(u, {
