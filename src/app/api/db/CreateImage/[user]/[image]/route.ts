@@ -78,13 +78,13 @@ async function handler(req: Request,{ params }: { params: { user: string, image:
         await images.save();
         
         const u = await ImageModel.findOneAndUpdate({ _id: image }, { $push: { childImages: images._id }},{ new: true } );
-        return NextResponse.json(u, {
+        return NextResponse.json({ savedImage: images, parentImage: u }, {
           headers: {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
             'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
           },
-      });
+        });
    
       } else {
         console.log('cloudinaryResponse is not an object or is null/undefined:', cloudinaryResponse);
