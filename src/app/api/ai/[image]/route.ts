@@ -86,13 +86,25 @@ const handler = async (req: Request, { params }:{ params: { image: string }}) =>
     return NextResponse.json({
       message: "Success",
       data: output,
-    });
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+      },
+  });
   } catch (error) {
     console.log(error);
     return NextResponse.json({
       message: "Failed",
       data: JSON.stringify(error),
-    });
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+      },
+  });
   }
 };
 export { handler as GET, handler as POST };

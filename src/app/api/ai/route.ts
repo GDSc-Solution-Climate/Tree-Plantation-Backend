@@ -21,7 +21,13 @@ const plants = lines.map((line:string) => {
 });
 
 
-  return NextResponse.json( plants );
+  return NextResponse.json( plants , {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+      'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+    },
+});
 }
 
 export { handler as GET , handler as POST }
