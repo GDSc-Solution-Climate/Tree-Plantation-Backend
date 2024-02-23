@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+const  sharp  = require("sharp");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const modelName = "gemini-pro-vision";
@@ -33,7 +34,6 @@ const handler = async (req: Request ) => {
   let formData = await req.formData();
   let body = Object.fromEntries(formData);
   const prompt = body.prompt as string;
-
   const path = body.filePath as File;
 
   // Validate file existence
@@ -41,12 +41,24 @@ const handler = async (req: Request ) => {
     return NextResponse.json({ error: 'Image file not found.' });
   }
   const arrayBuffer = await path.arrayBuffer();
-  const buffer = new Uint8Array(arrayBuffer);
+  let buffer = new Uint8Array(arrayBuffer);
+  let imageSizeInMB = buffer.length/(1024*1024);
 
-   
+   console.log("first : " + imageSizeInMB)
+   console.log(buffer);
+
+  if ( path.size  > 4*1024*1024) {
+     buffer = await sharp(buffer)
+      .resize({ width: 1024, height: 1024 })
+      .toBuffer();
+     imageSizeInMB = buffer.length / (1024 * 1024); // Convert bytes to MB
+     console.log(imageSizeInMB + " after resizing");
+     console.log(buffer);
+    
+  }
 
   try {
-
+    console.log("inside try : "+imageSizeInMB)
     const data = await generateContent(buffer,prompt);
     
     return NextResponse.json({
@@ -72,5 +84,6 @@ const handler = async (req: Request ) => {
       },
   });
   }
+  
 };
 export { handler as GET, handler as POST };
