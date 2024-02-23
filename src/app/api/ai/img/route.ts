@@ -60,6 +60,7 @@ const handler = async (req: Request ) => {
       },
   });
   } catch (error) {
+    console.log(error);
     return NextResponse.json({
       message: "Failed",
       data: JSON.stringify(error),
