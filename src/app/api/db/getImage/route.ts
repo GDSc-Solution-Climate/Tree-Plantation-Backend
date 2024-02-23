@@ -6,7 +6,7 @@ async function handler(req: Request) {
     try{
     await dbConnect();
 
-    const user = await ImageModel.find();
+    const user = await ImageModel.find({parentImage:null});
     return  NextResponse.json(user, {
         headers: {
           'Access-Control-Allow-Origin': '*',
