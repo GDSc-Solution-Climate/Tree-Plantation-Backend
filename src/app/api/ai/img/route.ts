@@ -56,6 +56,7 @@ function base64ArrayBuffer(arrayBuffer:Buffer) {
   
   return base64
 }
+
 function fileToGenerativePath(buffer:any, mimeType:string) {
     const base64String = base64ArrayBuffer(buffer);
     return {
