@@ -1,6 +1,8 @@
-![](./public/connect.jpg)
-
+<p align="center">
+  <img src="./public/connect.jpg" />
+</p>
 <div style="text-align:center;" align="center">Connect Green
+   
 <br>
     <a href="https://github.com/GDSc-Solution-Climate/Tree-Plantation-Backend"><strong>Learn more »</strong></a>
     <br>
